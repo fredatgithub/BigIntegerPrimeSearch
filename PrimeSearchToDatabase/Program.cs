@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Diagnostics;
@@ -26,7 +25,18 @@ namespace PrimeSearchToDatabase
       };
 
       // continuing search from the last prime number found
-      string lastNumberComputed = ReadFile("lastNumber.txt");
+      var connectionString = GetConnectionString("PrimeNumbers");
+      var lastMaxPrimeSqlRequest = GetMaxNumberSqlRequest();
+      string lastNumberComputed = "11657"; // last known
+      lastNumberComputed = ExecuteSqlQuery(connectionString, lastMaxPrimeSqlRequest);
+      if (lastNumberComputed.StartsWith("ko|"))
+      {
+        Console.WriteLine($"erreur : {lastNumberComputed}");
+        return;
+      }
+
+      Display($"Le dernier nombre premier calculé est : {lastNumberComputed}");
+      //string lastNumberComputed = ReadFile("lastNumber.txt");
       var source = BigInteger.Parse(lastNumberComputed);
       if (source % 2 == 0)
       {
@@ -87,7 +97,7 @@ namespace PrimeSearchToDatabase
       Console.ReadKey();
     }
 
-    private static string GetConnectionString(string database = "PrimeNumbers")
+    private static string GetConnectionString(string database)
     {
       return $"Server=localhost;Database={database};Trusted_Connection=True;";
     }
@@ -111,7 +121,11 @@ namespace PrimeSearchToDatabase
             {
               while (reader.Read())
               {
-                result = reader.GetString(0);
+                var value = reader.GetValue(0); 
+                if (value != DBNull.Value)
+                {
+                  result = value.ToString(); 
+                }
               }
             }
           }
