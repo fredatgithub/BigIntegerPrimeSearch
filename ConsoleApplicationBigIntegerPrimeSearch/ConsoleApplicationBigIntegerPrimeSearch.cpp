@@ -28,12 +28,12 @@ static void WriteToFile(const std::string& filename, const std::string& message,
 }
 
 // Fonction pour ajouter la date et l'heure au nom d'un fichier
-static std::string AddTimetoFilenameOLD(const std::string& filename) {
-  auto now = std::time(nullptr);
-  char buffer[80];
-  std::strftime(buffer, sizeof(buffer), "%Y-%m-%d_%H-%M-%S", std::localtime(&now));
-  return filename + "-" + buffer + ".txt";
-}
+//static std::string AddTimetoFilenameOLD(const std::string& filename) {
+//  auto now = std::time(nullptr);
+//  char buffer[80];
+//  std::strftime(buffer, sizeof(buffer), "%Y-%m-%d_%H-%M-%S", std::localtime(&now));
+//  return filename + "-" + buffer + ".txt";
+//}
 
 static std::string AddTimetoFilename(const std::string& filename) {
   auto now = std::time(nullptr); // Obtenir l'heure actuelle
@@ -76,7 +76,7 @@ int main() {
 
   auto now = std::time(nullptr);
   char buffer[80];
-  std::strftime(buffer, sizeof(buffer), "%Y-%m-%d_%H-%M-%S", std::localtime(&now));
+  //std::strftime(buffer, sizeof(buffer), "%Y-%m-%d_%H-%M-%S", std::localtime(&now));
   std::cout << "Début de la recherche : " << buffer << std::endl;
 
   // Lecture du dernier nombre traité
