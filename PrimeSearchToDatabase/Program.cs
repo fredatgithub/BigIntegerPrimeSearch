@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PrimeSearchToDatabase
 {
@@ -10,7 +6,12 @@ namespace PrimeSearchToDatabase
   {
     static void Main()
     {
+      Action<string> Display = Console.WriteLine;
+      Display("Recherche  des nombres premiers et enregistrement dans une base de données");
 
+
+      Display("Press any key to exit:");
+      Console.ReadKey();
     }
   }
 }
