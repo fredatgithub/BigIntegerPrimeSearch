@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -83,6 +85,44 @@ namespace PrimeSearchToDatabase
       Display($"End of processing on {DateTime.Now}");
       Display("Press any key to exit:");
       Console.ReadKey();
+    }
+
+    private static string GetConnectionString(string database = "PrimeNumbers")
+    {
+      return $"Server=localhost;Database={database};Trusted_Connection=True;";
+    }
+
+    private static string GetMaxNumberSqlRequest()
+    {
+      return "SELECT MAX(CAST(PrimeNumber AS BIGINT)) AS MaxValeur FROM Primes WHERE ISNUMERIC(PrimeNumber) = 1;";
+    }
+
+    private static string ExecuteSqlQuery(string connectionString, string sqlRequest)
+    {
+      var result = string.Empty;
+      using (SqlConnection connection = new SqlConnection(connectionString))
+      {
+        try
+        {
+          connection.Open();
+          using (SqlCommand command = new SqlCommand(sqlRequest, connection))
+          {
+            using (SqlDataReader reader = command.ExecuteReader())
+            {
+              while (reader.Read())
+              {
+                result = reader.GetString(0);
+              }
+            }
+          }
+        }
+        catch (Exception exception)
+        {
+          return $"ko|{exception.Message}";
+        }
+      }
+
+      return result;
     }
 
     /// <summary>Calculate if a big Integer number is prime.</summary>
