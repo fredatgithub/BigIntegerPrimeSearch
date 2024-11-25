@@ -48,11 +48,10 @@ namespace PrimeSearchToDatabase
       Display($"Starting searching from: {startNumber.ToString("N0", formatInfo)}");
       Display(string.Empty);
       var counter = 0;
-      int increment = 5000; // Settings.Default.IncrementNumber;
-      Display($"Searching for {increment} numbers after {startNumber.ToString("N0", formatInfo)}");
-      //Display($"Processing numbers until{FunctionsString.Tabulation(increment.ToString().Length)}{(startNumber + increment).ToString("N0", formatInfo)}");
+      int increment = 5000; // how many numbers before saving to database
+      Display($"Searching for prime numbers after {startNumber.ToString("N0", formatInfo)}");
       Display(string.Empty);
-      var endNumber = startNumber + increment;
+      //var endNumber = startNumber + increment;
       var primes = new List<BigInteger>();
       var chrono = new Stopwatch();
       chrono.Start();
@@ -71,12 +70,12 @@ namespace PrimeSearchToDatabase
       string numberOfPrimefound;
       if (counter == 0)
       {
-        numberOfPrimefound = "No prime found between: " + $"{startNumber.ToString("N0", formatInfo)} and " + $"{endNumber.ToString("N0", formatInfo)}";
+        numberOfPrimefound = "No prime found between: " + $"{startNumber.ToString("N0", formatInfo)} and ";
         Display(numberOfPrimefound);
       }
       else
       {
-        numberOfPrimefound = $"{counter} prime{Plural(counter)} found between: " + $"{startNumber.ToString("N0", formatInfo)} and " + $"{endNumber.ToString("N0", formatInfo)}";
+        numberOfPrimefound = $"{counter} prime{Plural(counter)} found between: " + $"{startNumber.ToString("N0", formatInfo)} and ";
         Display(numberOfPrimefound);
       }
 
@@ -86,10 +85,11 @@ namespace PrimeSearchToDatabase
       //today = DateTime.Now;
       //todayFormatted = today.ToString().Replace('/', '-').Replace(' ', '_').Replace(':', '-');
       var filename = $"TimeTaken.txt";
-      WriteToFile(filename, $"To search for prime numbers within {increment} numbers, it took : {FormatElapseTime(chrono.Elapsed)} starting at {startNumber} and ending at {endNumber}", true);
+      WriteToFile(filename, $"To search for prime numbers within {increment} numbers, it took : {FormatElapseTime(chrono.Elapsed)} starting at {startNumber}", true);
       filename = $"BigIntegerPrimes";
       WriteToFile(AddTimetoFilename(filename), primes);
-      WriteToFile("lastNumber.txt", endNumber.ToString());
+      // saving to database
+      //WriteToFile("lastNumber.txt", endNumber.ToString());
       Display("The result were written to a file on a disk: BigIntegerPrimes.txt");
       Display(string.Empty);
       Display($"End of processing on {DateTime.Now}");
