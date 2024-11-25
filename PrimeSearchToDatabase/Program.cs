@@ -48,53 +48,61 @@ namespace PrimeSearchToDatabase
       Display($"Starting searching from: {startNumber.ToString("N0", formatInfo)}");
       Display(string.Empty);
       var counter = 0;
-      int increment = 5000; // how many numbers before saving to database
+      int increment = 500; // how many numbers before saving to database
       Display($"Searching for prime numbers after {startNumber.ToString("N0", formatInfo)}");
       Display(string.Empty);
       //var endNumber = startNumber + increment;
       var primes = new List<BigInteger>();
       var chrono = new Stopwatch();
-      chrono.Start();
-      for (int i = 0; i < increment; i += 2)
+      while (true)
       {
-        var currentNumber = startNumber + i;
-        if (IsPrime(currentNumber))
+        chrono.Start();
+        for (int i = 0; i < increment; i += 2)
         {
-          Display($"{currentNumber.ToString("N0", formatInfo)} is prime");
-          counter++;
-          primes.Add(currentNumber);
+          var currentNumber = startNumber + i;
+          if (IsPrime(currentNumber))
+          {
+            Display($"{currentNumber.ToString("N0", formatInfo)} is prime");
+            counter++;
+            primes.Add(currentNumber);
+          }
         }
+
+        chrono.Stop();
+        string numberOfPrimefound;
+        if (counter == 0)
+        {
+          numberOfPrimefound = "No prime found between: " + $"{startNumber.ToString("N0", formatInfo)} and ";
+          Display(numberOfPrimefound);
+        }
+        else
+        {
+          numberOfPrimefound = $"{counter} prime{Plural(counter)} found between: " + $"{startNumber.ToString("N0", formatInfo)} and ";
+          Display(numberOfPrimefound);
+        }
+
+        Display(string.Empty);
+        // record to database list of primes
+
+
       }
 
-      chrono.Stop();
-      string numberOfPrimefound;
-      if (counter == 0)
-      {
-        numberOfPrimefound = "No prime found between: " + $"{startNumber.ToString("N0", formatInfo)} and ";
-        Display(numberOfPrimefound);
-      }
-      else
-      {
-        numberOfPrimefound = $"{counter} prime{Plural(counter)} found between: " + $"{startNumber.ToString("N0", formatInfo)} and ";
-        Display(numberOfPrimefound);
-      }
 
-      Display(string.Empty);
-      WriteToFile("PrimeCounter.txt", numberOfPrimefound, true);
-      Display($"To search for prime numbers within {increment} numbers, it took : {FormatElapseTime(chrono.Elapsed)}");
+      //WriteToFile("PrimeCounter.txt", numberOfPrimefound, true);
+      //Display($"To search for prime numbers within {increment} numbers, it took : {FormatElapseTime(chrono.Elapsed)}");
       //today = DateTime.Now;
       //todayFormatted = today.ToString().Replace('/', '-').Replace(' ', '_').Replace(':', '-');
-      var filename = $"TimeTaken.txt";
-      WriteToFile(filename, $"To search for prime numbers within {increment} numbers, it took : {FormatElapseTime(chrono.Elapsed)} starting at {startNumber}", true);
-      filename = $"BigIntegerPrimes";
-      WriteToFile(AddTimetoFilename(filename), primes);
+      //var filename = $"TimeTaken.txt";
+      //WriteToFile(filename, $"To search for prime numbers within {increment} numbers, it took : {FormatElapseTime(chrono.Elapsed)} starting at {startNumber}", true);
+      //filename = $"BigIntegerPrimes";
+      //WriteToFile(AddTimetoFilename(filename), primes);
       // saving to database
       //WriteToFile("lastNumber.txt", endNumber.ToString());
-      Display("The result were written to a file on a disk: BigIntegerPrimes.txt");
-      Display(string.Empty);
-      Display($"End of processing on {DateTime.Now}");
-      Display("Press any key to exit:");
-      Console.ReadKey();
+      //Display("The result were written to a file on a disk: BigIntegerPrimes.txt");
+      //Display(string.Empty);
+      //Display($"End of processing on {DateTime.Now}");
+      //Display("Press any key to exit:");
+      //Console.ReadKey();
     }
 
     private static string GetConnectionString(string database)
