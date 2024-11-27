@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Numerics;
+using System.Xml.XPath;
 
 namespace PrimeSearchToDatabase
 {
@@ -43,66 +44,30 @@ namespace PrimeSearchToDatabase
         source++;
       }
 
+      source += 2;
       var startNumber = source;
       Display(string.Empty);
       Display($"Starting searching from: {startNumber.ToString("N0", formatInfo)}");
       Display(string.Empty);
-      var counter = 0;
-      int increment = 500; // how many numbers before saving to database
       Display($"Searching for prime numbers after {startNumber.ToString("N0", formatInfo)}");
       Display(string.Empty);
-      //var endNumber = startNumber + increment;
-      var primes = new List<BigInteger>();
-      var chrono = new Stopwatch();
+      var currentNumber = startNumber;
       while (true)
       {
-        chrono.Start();
-        for (int i = 0; i < increment; i += 2)
+        if (IsPrime(currentNumber))
         {
-          var currentNumber = startNumber + i;
-          if (IsPrime(currentNumber))
-          {
-            Display($"{currentNumber.ToString("N0", formatInfo)} is prime");
-            counter++;
-            primes.Add(currentNumber);
-          }
+          Display($"{currentNumber.ToString("N0", formatInfo)} is prime");
+          // we save the prime as soon as found
+          var insertResult = ExecuteInsertIntoDatabase(connectionString, currentNumber.ToString());
         }
 
-        chrono.Stop();
-        string numberOfPrimefound;
-        if (counter == 0)
-        {
-          numberOfPrimefound = "No prime found between: " + $"{startNumber.ToString("N0", formatInfo)} and ";
-          Display(numberOfPrimefound);
-        }
-        else
-        {
-          numberOfPrimefound = $"{counter} prime{Plural(counter)} found between: " + $"{startNumber.ToString("N0", formatInfo)} and ";
-          Display(numberOfPrimefound);
-        }
-
-        Display(string.Empty);
-        // record to database list of primes
-
-
+        currentNumber += 2;
       }
+    }
 
-
-      //WriteToFile("PrimeCounter.txt", numberOfPrimefound, true);
-      //Display($"To search for prime numbers within {increment} numbers, it took : {FormatElapseTime(chrono.Elapsed)}");
-      //today = DateTime.Now;
-      //todayFormatted = today.ToString().Replace('/', '-').Replace(' ', '_').Replace(':', '-');
-      //var filename = $"TimeTaken.txt";
-      //WriteToFile(filename, $"To search for prime numbers within {increment} numbers, it took : {FormatElapseTime(chrono.Elapsed)} starting at {startNumber}", true);
-      //filename = $"BigIntegerPrimes";
-      //WriteToFile(AddTimetoFilename(filename), primes);
-      // saving to database
-      //WriteToFile("lastNumber.txt", endNumber.ToString());
-      //Display("The result were written to a file on a disk: BigIntegerPrimes.txt");
-      //Display(string.Empty);
-      //Display($"End of processing on {DateTime.Now}");
-      //Display("Press any key to exit:");
-      //Console.ReadKey();
+    private static string GetInsertPrimeRequest()
+    {
+      return "INSERT INTO Primes (PrimeNumber) VALUES ('{primeNumber}');";
     }
 
     private static string GetConnectionString(string database)
@@ -113,6 +78,33 @@ namespace PrimeSearchToDatabase
     private static string GetMaxNumberSqlRequest()
     {
       return "SELECT MAX(CAST(PrimeNumber AS BIGINT)) AS MaxValeur FROM Primes WHERE ISNUMERIC(PrimeNumber) = 1;";
+    }
+
+    private static string ExecuteInsertIntoDatabase(string connectionString, string primeValue)
+    {
+      var result = "ok|";
+      const string query = "INSERT INTO Primes (PrimeNumber) VALUES (@PrimeValue)";
+
+      try
+      {
+        using (SqlConnection connection = new SqlConnection(connectionString))
+        {
+          connection.Open();
+          using (SqlCommand command = new SqlCommand(query, connection))
+          {
+            // Ajouter le paramètre pour éviter les injections SQL
+            command.Parameters.AddWithValue("@PrimeValue", primeValue);
+            int rowsAffected = command.ExecuteNonQuery();
+            result += rowsAffected;
+          }
+        }
+      }
+      catch (Exception exception)
+      {
+        result = $"ko|{exception.Message}";
+      }
+
+      return result;
     }
 
     private static string ExecuteSqlQuery(string connectionString, string sqlRequest)
@@ -129,10 +121,10 @@ namespace PrimeSearchToDatabase
             {
               while (reader.Read())
               {
-                var value = reader.GetValue(0); 
+                var value = reader.GetValue(0);
                 if (value != DBNull.Value)
                 {
-                  result = value.ToString(); 
+                  result = value.ToString();
                 }
               }
             }
