@@ -26,7 +26,7 @@ namespace PrimeSearchToDatabase
       };
 
       // continuing search from the last prime number found
-      var connectionString = GetConnectionString("PrimeNumbers");
+      var connectionString = GetConnectionString("PrimeNumbers2");
       var lastMaxPrimeSqlRequest = GetMaxNumberSqlRequest();
       string lastNumberComputed = "11657"; // last known
       lastNumberComputed = ExecuteSqlQuery(connectionString, lastMaxPrimeSqlRequest);
